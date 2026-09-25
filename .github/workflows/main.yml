@@ -4,31 +4,65 @@ on:
   push:
     branches: [main]
 
+env:
+  SERVER_URL: "http://192.168.0.101:8503"
+  APP_ID: "br.com.vectrawork.operacao"
+  APP_NAME: "Operacao Vectra"
+
 jobs:
   apk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: '20'
-      - uses: actions/setup-java@v4
+          node-version: '22'
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: '17'
-      - uses: android-actions/setup-android@v3
+          java-version: '21'
+
+      - name: Aceitar licencas do Android SDK
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
+
+      - name: Montar o projeto
+        run: |
+          mkdir -p www
+          echo '<!doctype html><meta charset="utf-8"><title>Operacao</title><body>Conectando...</body>' > www/index.html
+          cat > package.json <<'FIM'
+          {
+            "name": "operacao-vectra",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "@capacitor/android": "^6.2.0",
+              "@capacitor/core": "^6.2.0",
+              "@capacitor/local-notifications": "^6.1.0"
+            },
+            "devDependencies": { "@capacitor/cli": "^6.2.0" }
+          }
+          FIM
+          cat > capacitor.config.json <<FIM
+          {
+            "appId": "${APP_ID}",
+            "appName": "${APP_NAME}",
+            "webDir": "www",
+            "server": { "url": "${SERVER_URL}", "cleartext": true },
+            "android": { "allowMixedContent": true }
+          }
+          FIM
+          cat capacitor.config.json
 
       - name: Instalar dependencias
         run: npm install
 
       - name: Montar projeto Android
-        run: npx cap add android || npx cap sync android
+        run: npx cap add android
 
       - name: Gerar APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
 
-      - name: Publicar o APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: operacao-vectra-apk
           path: android/app/build/outputs/apk/debug/*.apk
