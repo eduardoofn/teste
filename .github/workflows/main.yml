@@ -1,11 +1,14 @@
+# Gera o APK do app Operação Vectra na nuvem, sem instalar nada no computador.
+# Depois de editar o SERVER_URL abaixo: Actions > Build APK > Run workflow.
 name: Build APK
+
 on:
   workflow_dispatch:
   push:
     branches: [main]
 
 env:
-  SERVER_URL: "http://192.168.0.101:8503"
+  SERVER_URL: "http://192.168.32.34:8503"
   APP_ID: "br.com.vectrawork.operacao"
   APP_NAME: "Operacao Vectra"
 
@@ -58,6 +61,19 @@ jobs:
 
       - name: Montar projeto Android
         run: npx cap add android
+
+      - name: Usar o icone da Vectra
+        run: |
+          if [ -d icones ]; then
+            for d in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+              mkdir -p android/app/src/main/res/mipmap-$d
+              cp icones/ic_launcher.png android/app/src/main/res/mipmap-$d/ic_launcher.png
+              cp icones/ic_launcher.png android/app/src/main/res/mipmap-$d/ic_launcher_round.png
+              cp icones/ic_launcher.png android/app/src/main/res/mipmap-$d/ic_launcher_foreground.png
+            done
+            rm -f android/app/src/main/res/mipmap-anydpi-v26/*.xml
+            echo "icone aplicado"
+          fi
 
       - name: Gerar APK
         run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
