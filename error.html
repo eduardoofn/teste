@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sem conexão | Operação Vectra</title>
+<style>
+  :root{--verde:#59c247;--verde-esc:#3f9631;--tinta:#1d2620;--tinta-2:#5a665e;--papel:#eef1ed;--linha:#d6dcd4}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+       font-family:'Barlow',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:var(--tinta);
+       background:radial-gradient(1200px 500px at 50% -10%,#e3f2df 0%,var(--papel) 60%)}
+  .caixa{background:#fff;width:min(420px,100%);border-radius:16px;border-top:6px solid var(--verde);
+         padding:30px 24px 24px;box-shadow:0 12px 40px rgba(29,38,32,.12);text-align:center}
+  .sinal{width:76px;height:76px;margin:0 auto 16px;border-radius:50%;background:#fbe7e4;
+         display:flex;align-items:center;justify-content:center;color:#cf3a2b}
+  h1{font-size:25px;line-height:1.2;margin:0 0 8px}
+  p{color:var(--tinta-2);margin:0 0 18px;line-height:1.5}
+  ul{text-align:left;margin:0 0 20px;padding-left:20px;color:var(--tinta-2);line-height:1.7}
+  ul b{color:var(--tinta)}
+  button{width:100%;min-height:54px;border:0;border-radius:12px;background:var(--verde-esc);color:#fff;
+         font-size:20px;font-weight:700;cursor:pointer;font-family:inherit}
+  button:active{transform:scale(.97)}
+  .tentando{opacity:.6;pointer-events:none}
+  small{display:block;margin-top:14px;color:var(--tinta-2);font-size:12.5px}
+</style>
+</head>
+<body>
+  <div class="caixa">
+    <div class="sinal">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M2 2 22 22"/><path d="M5 12.5a10 10 0 0 1 5.2-2.4"/><path d="M1.5 8.5a15 15 0 0 1 5-3.2"/>
+        <path d="M17.5 12.5a10 10 0 0 0-2.7-1.7"/><path d="M22.5 8.5a15 15 0 0 0-5.6-3.4"/>
+        <path d="M8.8 16.3a5 5 0 0 1 6.4 0"/><circle cx="12" cy="20" r="1" fill="currentColor"/>
+      </svg>
+    </div>
+    <h1>Sem conexão com o servidor</h1>
+    <p>O app não conseguiu falar com o sistema da fábrica agora.</p>
+    <ul>
+      <li>Confira se o celular está no <b>Wi-Fi da fábrica</b></li>
+      <li>Saia e volte para a área de cobertura</li>
+      <li>Se ninguém conseguir abrir, avise a <b>TI</b>: o servidor pode estar desligado</li>
+    </ul>
+    <button id="btn" onclick="tentar()">Tentar de novo</button>
+    <small id="aviso">Os chamados já enviados estão salvos no servidor.</small>
+  </div>
+<script>
+  function tentar() {
+    const b = document.getElementById('btn');
+    b.classList.add('tentando'); b.textContent = 'Tentando…';
+    setTimeout(() => location.reload(), 400);
+  }
+  // reconecta sozinho assim que o celular voltar para a rede
+  window.addEventListener('online', () => setTimeout(() => location.reload(), 800));
+  let voltas = 0;
+  setInterval(() => {
+    if (!navigator.onLine || voltas > 60) return;
+    voltas++;
+    document.getElementById('aviso').textContent = 'Procurando o servidor…';
+    location.reload();
+  }, 15000);
+</script>
+</body>
+</html>
