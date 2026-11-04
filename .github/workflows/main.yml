@@ -11,7 +11,7 @@ env:
   # >>> TROQUE PELO ENDEREÇO DO SISTEMA <<<
   # Rede interna:  http://IP-DO-SERVIDOR:8503
   # Na nuvem:      https://operacao-vectra.onrender.com
-  SERVER_URL: "http://192.168.34.17:8503"
+  SERVER_URL: "http://192.168.34.206:8503"
   APP_ID: "br.com.vectrawork.operacao"
   APP_NAME: "Operacao Vectra"
 
